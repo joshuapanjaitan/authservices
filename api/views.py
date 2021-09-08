@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse, response
 from django.db.models import Q
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import  IsAuthenticated
 from rest_framework.response import Response
 from .serializers import UserSerializer
 from django.contrib.auth.models import Group,User
@@ -27,7 +28,10 @@ def userList(request):
     return Response(serializer.data)
 
 
+
+
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def authentication(request):
     fetch  = request.data
     try:
@@ -47,26 +51,17 @@ def authentication(request):
         elif group != 'management':
             response = JsonResponse(data= {
                 'message':"Not Authorized",
-                'status_code':501,
+                'status_code':401,
                 'auth_value':False,
             })
-            response.status_code = 501
+            response.status_code = 401
         
-        else:
-            response = JsonResponse(data= {
-                'message':"Username or password Incorect",
-                'status_code':501,
-                'auth_value':False,
-            })
-            response.status_code = 501
-
-
     except:
         response = JsonResponse(data= {
             'message':"Something went Wrong, Check your Username or Password",
-            'status_code':501,
-            'data':False,
+            'status_code':406,
+            'auth_value':False,
         })
-        response.status_code = 501
+        response.status_code = 406
 
     return response
