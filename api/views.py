@@ -7,8 +7,11 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 from django.contrib.auth.models import Group,User
 from django.contrib.auth import authenticate,login,logout
+from .forms import CreateUserForm
+from api import forms, serializers
+import random
 
-from api import serializers
+sec_alfanumeric = '0123456789abcdefghijklmnopqrstuvwxzyABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 # Create your views here.
 # Create your views here.
@@ -17,7 +20,6 @@ def api_overview(request):
     api_url = {
         'Auth Login':'/auth-list/',
         'Auth Register':'/auth-register/',
-
     }
     return Response(api_url)
 
@@ -61,6 +63,55 @@ def authentication(request):
             'message':"Something went Wrong, Check your Username or Password",
             'status_code':406,
             'auth_value':False,
+        })
+        response.status_code = 406
+
+    return response
+
+
+#resigter API
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def registration(request):
+    fetch = request.data
+    try:
+        uname = fetch["username"]
+        email = fetch["email"]
+        pwd1 = fetch["password1"]
+        pwd2 = fetch["password2"]
+        secret = ''.join(random.choice(sec_alfanumeric) for i in range(16))
+
+        req_form = {
+            'csrfmiddlewaretoken':secret,
+            'username':uname,
+            'email':email,
+            'password1':pwd1,
+            'password2':pwd2
+        }
+        form = CreateUserForm(req_form)
+        if form.is_valid():
+            usr = form.save(commit = False)
+            usr.is_active = False
+            usr.save()
+            resp = "Form Valid"
+            ssts_code = 200
+            msg = "Register Successfuly kindly Check your Email for Verification" 
+        else:
+            msg = "Registration Failed" 
+            ssts_code = 406
+            resp = form.errors
+
+        response = JsonResponse(data= {
+                'message':msg,
+                'status_code':ssts_code,
+                'auth_value':resp,
+            })
+        response.status_code = ssts_code
+    except:
+        response = JsonResponse(data= {
+            'message':"Something went Wrong, Check your Username or Password",
+            'status_code':406,
+            'auth_value':"Registration Error",
         })
         response.status_code = 406
 

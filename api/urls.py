@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.api_overview, name='services'),
     path('ulist/', views.userList, name='ulist'),
     path('auth-list/', views.authentication, name='auth-list'),
+    path('auth-register/', views.registration, name='auth-regis'),
 
 ]
 
