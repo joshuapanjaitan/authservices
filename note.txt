@@ -1,0 +1,1 @@
+docker tag jember:latest 765299591177.dkr.ecr.ap-southeast-1.amazonaws.com/jember:latest
