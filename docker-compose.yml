@@ -2,11 +2,9 @@ version: '3.7'
 
 services: 
   auth:
-    image: joshuapn/auth
     build: 
       context: . 
   proxy:
-    image: joshuapn/proxy
     build: 
       context: ./proxy
     ports: 

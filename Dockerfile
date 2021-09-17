@@ -15,6 +15,8 @@ RUN apk del .tmp
 RUN mkdir /auth
 COPY ./auth /auth
 WORKDIR /auth
+EXPOSE 8000
+
 COPY ./scripts /scripts
 
 #run scripts
